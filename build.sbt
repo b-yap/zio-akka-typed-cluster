@@ -23,15 +23,32 @@ developers := List(
   )
 )
 
-libraryDependencies ++= Seq(
-  "dev.zio"           %% "zio"                   % "1.0.0-RC10-1",
-  "dev.zio"           %% "zio-streams"           % "1.0.0-RC10-1",
-  "com.typesafe.akka" %% "akka-cluster-tools"    % "2.5.23",
-  "com.typesafe.akka" %% "akka-cluster-sharding" % "2.5.23",
-  "org.scalatest"     %% "scalatest"             % "3.0.8" % "test",
+lazy val zioOrg       = "dev.zio"
+lazy val zioVersion   = "1.0.0-RC10-1"
+
+lazy val zio          = zioOrg %% "zio"         % zioVersion
+lazy val zioStreams   = zioOrg %% "zio-streams" % zioVersion
+
+lazy val akkaOrg      = "com.typesafe.akka"
+lazy val akkaVersion  = "2.5.23"
+
+lazy val scalaTest    = "org.scalatest"     %% "scalatest"             % "3.0.8" % "test"
+
+
+libraryDependencies ++= Seq(zio,zioStreams, scalaTest,
+  akkaOrg %% "akka-cluster-tools"    % akkaVersion,
+  akkaOrg %% "akka-cluster-sharding" % akkaVersion,
   compilerPlugin("org.typelevel" %% "kind-projector"     % "0.10.3"),
-  compilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1")
-)
+  compilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1"))
+
+
+lazy val clusterTyped : Project = Project(id="ClusterTyped", base =file("zio-akka-cluster-typed"))
+  .settings(
+    name:= "zioAkkaClusterTyped",
+    libraryDependencies++=Seq(zio,zioStreams, scalaTest,
+      akkaOrg %% "akka-cluster-typed" % akkaVersion,
+      akkaOrg %% "akka-cluster-sharding-typed" % akkaVersion,
+      akkaOrg %% "akka-persistence-typed" % akkaVersion))
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -76,6 +93,9 @@ scalacOptions ++= Seq(
 })
 
 fork in run := true
+
+
+
 
 crossScalaVersions := allScala
 
